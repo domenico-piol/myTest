@@ -12,6 +12,6 @@ USER mytest-user
 
 WORKDIR /myTest
 
-COPY target/myTest-0.0.1-SNAPSHOT.jar myTest.jar
+COPY target/my-test-0.0.1-SNAPSHOT.jar my-test.jar
 
-ENTRYPOINT ["java", "-jar", "myTest.jar"]
+ENTRYPOINT ["java", "-jar", "my-test.jar"]
