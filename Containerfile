@@ -1,4 +1,7 @@
-FROM openjdk:21-slim
+#FROM openjdk:21-slim
+FROM ubi9/openjdk-21
+
+USER root
 
 RUN mkdir /myTest && \
     chmod 777 /myTest && \
