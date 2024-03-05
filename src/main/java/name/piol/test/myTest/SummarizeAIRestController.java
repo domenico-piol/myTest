@@ -6,6 +6,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/*
+ * https://huggingface.co/facebook/bart-large-cnn
+ */
+
 @RestController
 public class SummarizeAIRestController {
 
