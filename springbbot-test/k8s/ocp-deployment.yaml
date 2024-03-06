@@ -28,7 +28,7 @@ metadata:
   name: springboot-test-service
 spec:
   ports:
-  - port: 80
+  - port: 8080
     protocol: TCP
     targetPort: 8080
   selector:
@@ -42,9 +42,6 @@ metadata:
 spec:
   port:
     targetPort: 8080
-  tls:
-    termination: passthrough 
-    insecureEdgeTerminationPolicy: Redirect
   wildcardPolicy: None
   to:
     kind: Service
