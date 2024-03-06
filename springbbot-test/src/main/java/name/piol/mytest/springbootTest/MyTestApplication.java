@@ -1,4 +1,4 @@
-package name.piol.test.myTest;
+package name.piol.mytest.springbootTest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

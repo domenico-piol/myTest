@@ -1,4 +1,4 @@
-package name.piol.test.myTest;
+package name.piol.mytest.springbootTest;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

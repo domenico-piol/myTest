@@ -1,4 +1,4 @@
-package name.piol.test.myTest;
+package name.piol.mytest.springbootTest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

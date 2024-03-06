@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-test-depl
+  labels:
+    app: springboot-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot-test
+  template:
+    metadata:
+      labels:
+        app: springboot-test
+    spec:
+      containers:
+      - name: springboot-test
+        image: docker.io/domenicopiol/springboot-test:v0.0.3
+        command: ["java"]
+        args: ["-jar", "/myTest/springboot-test.jar"]
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-test-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: springboot-test
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: springboot-test-route
+spec:
+  port:
+    targetPort: 8080
+  tls:
+    termination: passthrough 
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+  to:
+    kind: Service
+    name: springboot-test-service
+    weight: 100

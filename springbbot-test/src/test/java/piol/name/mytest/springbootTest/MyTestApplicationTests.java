@@ -1,4 +1,4 @@
-package name.piol.test.myTest;
+package name.piol.mytest.springbootTest;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
