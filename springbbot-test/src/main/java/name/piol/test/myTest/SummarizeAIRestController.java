@@ -6,6 +6,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/*
+ * https://huggingface.co/facebook/bart-large-cnn
+ */
+
 @RestController
 public class SummarizeAIRestController {
 
@@ -15,7 +19,7 @@ public class SummarizeAIRestController {
     public String greeting(@PathVariable String article) {
         logger.info("Summarizing a text...");
         logger.debug(article);
-        return "I am sorry Dave, you can't do that!";
+        return "I am sorry Dave, you can't do that! ...yet";
     }
 
 }
