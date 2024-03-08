@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: quarkus-test
-        image: docker.io/domenicopiol/quarkus-test:v0.0.1
-        command: ["application"]
+        image: docker.io/domenicopiol/quarkus-test:latest
+        command: ["./application"]
         args: ["-Dquarkus.http.host=0.0.0.0"]
         ports:
         - containerPort: 8080
