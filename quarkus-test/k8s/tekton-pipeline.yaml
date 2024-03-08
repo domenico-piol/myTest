@@ -78,27 +78,27 @@ spec:
           workspace: shared-workspace
         - name: dockerconfig
           workspace: dockerconfig-ws
-    # - name: qcomplaints-skopeo-copy
-    #   taskRef:
-    #     name: dpiol-skopeo-copy
-    #   runAfter:
-    #     - qcomplaints-buildah
-    #   params:
-    #     - name: srcImageURL
-    #       value: docker://$(params.container-repo)/sccstore-qcomplaints:$(context.pipelineRun.uid)
-    #     - name: destImageURL
-    #       value: docker://$(params.container-repo)/sccstore-qcomplaints:latest
-    #     - name: srcTLSverify
-    #       value: 'false'
-    #     - name: destTLSverify
-    #       value: 'false'
-    #     - name: credentials
-    #       value: rhworkshops-dockerio-creds-username
-    #     - name: containerRegistry
-    #       value: $(params.container-registry)
-    #   workspaces:
-    #     - name: images-url
-    #       workspace: shared-workspace
+    - name: skopeo-copy
+      taskRef:
+        name: dpiol-skopeo-copy
+      runAfter:
+        - buildah
+      params:
+        - name: srcImageURL
+          value: docker://$(params.container-repo)/quarkus-test:$(context.pipelineRun.uid)
+        - name: destImageURL
+          value: docker://$(params.container-repo)/quarkus-test:latest
+        - name: srcTLSverify
+          value: 'false'
+        - name: destTLSverify
+          value: 'false'
+        - name: credentials
+          value: dockerio-creds-username
+        - name: containerRegistry
+          value: $(params.container-registry)
+      workspaces:
+        - name: images-url
+          workspace: shared-workspace
   finally:
     - name: print-buildinfo
       taskRef: 
