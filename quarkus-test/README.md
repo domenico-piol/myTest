@@ -19,22 +19,3 @@ You can create a native executable using:
 ```shell script
 mvn package -Dnative
 ```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-mvn package -Dnative -Dquarkus.native.container-build=true
-```
-
-## Building multi-architecture image
-In my environment I work on a M3 MacBook Pro... but the OpenShift cluster runs on x86 hardware. This said, I need multi-arch images. Easy...
-
-**Create the Manifest-image**
-``podman manifest create domenicopiol/quarkus-test:v0.0.1``
-
-**Build the 2 images in one go**
-``podman build --platform linux/amd64,linux/arm64  --manifest domenicopiol/quarkus-test:v0.0.1 .``
-
-**Push the complete bundle to the registry**
-``podman manifest push domenicopiol/quarkus-test:v0.0.1``
-
-The k8s manifest (deployment) is unchanged... picks up correctly the respective architecture.
