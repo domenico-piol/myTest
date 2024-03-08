@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build-info
+spec:
+  description: print some info about the build
+  params:
+    - name: buildID
+      type: string
+      default: "          no ID given!!!!           "
+  steps:
+    - name: print-buildid
+      image: alpine
+      script: | 
+        #!/bin/sh
+        echo '################################################'
+        echo '##    $(params.buildID)    ##'
+        echo '################################################'

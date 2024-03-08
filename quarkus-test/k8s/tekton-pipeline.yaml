@@ -1,0 +1,122 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: quarkus-test-pipeline
+spec:
+  description: | 
+    This pipeline builds the SCCStore application
+  params:
+    - name: repo-url
+      type: string
+      description: The git repo URL to clone from.
+    - name: container-repo
+      type: string
+      description: The container repo URL to be used.
+    - name: container-registry
+      type: string
+      description: The container registry (e.g. docker.io)
+    - name: repo-branch
+      type: string
+      description: The branch to be used.
+  workspaces:
+    - name: shared-workspace
+    - name: maven-settings
+    - name: maven-local-m2
+    - name: dockerconfig-ws
+      optional: true
+  tasks:
+    - name: fetch-repository
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.repo-branch)
+        - name: deleteExisting
+          value: "true"
+    - name: maven-run
+      taskRef:
+        name: maven
+      runAfter:
+        - fetch-repository
+      params:
+        - name: MAVEN_IMAGE
+          value: docker.io/domenicopiol/builder-graalvm21:latest
+        - name: CONTEXT_DIR
+          value: "quarkus-test"
+        - name: GOALS
+          value:
+            - -B
+            - package
+            - '-DskipTests'
+            - '-Dnative'
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: shared-workspace
+        - name: maven-local-repo
+          workspace: maven-local-m2
+    - name: buildah
+      taskRef:
+        name: buildah
+      runAfter:
+        - maven-run
+      params:
+        - name: CONTEXT
+          value: "quarkus-test"
+        - name: DOCKERFILE
+          value: "./Containerfile"
+        - name: IMAGE
+          value: $(params.container-repo)/quarkus-test:$(context.pipelineRun.uid)
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: dockerconfig
+          workspace: dockerconfig-ws
+    # - name: qcomplaints-skopeo-copy
+    #   taskRef:
+    #     name: dpiol-skopeo-copy
+    #   runAfter:
+    #     - qcomplaints-buildah
+    #   params:
+    #     - name: srcImageURL
+    #       value: docker://$(params.container-repo)/sccstore-qcomplaints:$(context.pipelineRun.uid)
+    #     - name: destImageURL
+    #       value: docker://$(params.container-repo)/sccstore-qcomplaints:latest
+    #     - name: srcTLSverify
+    #       value: 'false'
+    #     - name: destTLSverify
+    #       value: 'false'
+    #     - name: credentials
+    #       value: rhworkshops-dockerio-creds-username
+    #     - name: containerRegistry
+    #       value: $(params.container-registry)
+    #   workspaces:
+    #     - name: images-url
+    #       workspace: shared-workspace
+  finally:
+    - name: print-buildinfo
+      taskRef: 
+        name: build-info
+      params:
+        - name: buildID
+          value: $(context.pipelineRun.uid)
+#
+# CAN BE USED FOR DEBUGGING
+#    - name: list-dir
+#      taskRef:
+#        name: list-directory
+#      runAfter:
+#        - fetch-repository
+#      params:
+#        - name: sub-dirs
+#          value:
+#            - .
+#      workspaces:
+#        - name: directory
+#          workspace: dockerconfig-ws

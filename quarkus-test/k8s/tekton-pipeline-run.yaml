@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: quarkus-test-pipeline-run
+spec:
+  pipelineRef:
+    name: quarkus-test-pipeline
+  workspaces:
+    - name: maven-settings
+      emptyDir: {}
+    - name: shared-workspace
+      persistentvolumeclaim:
+        claimName: maven-source-pvc
+    - name: maven-local-m2
+      persistentvolumeclaim:
+        claimName: maven-repo-pvc
+    - name: dockerconfig-ws
+      secret:
+        secretName: dockerconfig-secret
+        #secretName: rhworkshops-dockerconfig-secret
+        #secretName: quay-dockerconfig-secret
+  params:
+    - name: repo-url
+      value: https://github.com/domenico-piol/myTest.git
+    - name: repo-branch
+      value: main
+    - name: container-repo
+      #value: quay.io/domenico_piol
+      #value: rhworkshops
+      value: registry-1.docker.io/domenicopiol
+    - name: container-registry
+      value: docker.io

@@ -1,0 +1,67 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: dpiol-skopeo-copy
+  labels:
+    app.kubernetes.io/version: "0.3"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: CLI
+    tekton.dev/tags: cli
+    tekton.dev/displayName: "skopeo copy"
+spec:
+  description: >-
+    Skopeo is a command line tool for working with remote image registries.
+  workspaces:
+    - name: images-url
+  params:
+    - name: srcImageURL
+      description: URL of the image to be copied to the destination registry
+      type: string
+      default: ""
+    - name: destImageURL
+      description: URL of the image where the image from source should be copied to
+      type: string
+      default: ""
+    - name: srcTLSverify
+      description: Verify the TLS on the src registry endpoint
+      type: string
+      default: "true"
+    - name: destTLSverify
+      description: Verify the TLS on the dest registry endpoint
+      type: string
+      default: "true"
+    - name: credentials
+      description: secret-name of the credentials
+      type: string
+    - name: containerRegistry
+      description: container registry URL 
+      type: string
+  steps:
+    - name: skopeo-copy
+      env:
+        - name: HOME
+          value: /opt/app-root/src
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: $(params.credentials)
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: $(params.credentials)
+              key: password
+      image: docker.io/domenicopiol/dpiol-devbuild:latest
+      script: |
+        export REGISTRY_AUTH_FILE=$HOME/skopeo.json
+        if [ "$(params.srcImageURL)" != "" ] && [ "$(params.destImageURL)" != "" ] ; then
+          skopeo login -u $USERNAME -p $PASSWORD $(params.containerRegistry)
+          echo "command: skopeo copy $(params.srcImageURL) $(params.destImageURL) --src-tls-verify=$(params.srcTLSverify) --dest-tls-verify=$(params.destTLSverify)"
+          skopeo copy "$(params.srcImageURL)" "$(params.destImageURL)" --src-tls-verify="$(params.srcTLSverify)" --dest-tls-verify="$(params.destTLSverify)"
+        else
+          echo "no images..."
+        fi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
